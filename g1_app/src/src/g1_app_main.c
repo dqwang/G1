@@ -15,7 +15,7 @@ int main(int argc, char *argv[])
 	//hal_ut_LED_screen_unicode();
 
 	//hal_ut_LED_screen_set_time();
-	//hal_ut_wstr_test();
+	hal_ut_wstr_test();
 #endif
 
 	

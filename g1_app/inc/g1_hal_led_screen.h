@@ -62,7 +62,7 @@ typedef enum {
 }HAL_LS_CMD_e;
 
 
-typedef struct hal_led_screen_param{
+typedef struct HAL_LS_PARAM_CMD_SEND_INFO_{
 	u16 info_seq;
 	u8 mode;
 	u8 flash_onoff;
@@ -84,6 +84,39 @@ typedef struct hal_led_screen_param{
 	u8 section;
 	u8 reserved;	
 }HAL_LS_PARAM_CMD_SEND_INFO_t;
+
+typedef struct HAL_LS_PARAM_CMD_SET_TIME_{
+	u8 year;
+	u8 month;
+	u8 day;
+	u8 hour;
+	
+	u8 minute;
+	u8 second;
+	u8 week;
+	u8 mode;
+
+	u16 calibration;// 0-20000
+
+	u8 reserved[22];
+
+}HAL_LS_PARAM_CMD_SET_TIME_t;
+
+typedef struct HAL_LS_PARAM_CMD_GET_TIME_{
+	u8 year;
+	u8 month;
+	u8 day;
+	u8 hour;
+	
+	u8 minute;
+	u8 second;
+	u8 week;
+	u8 mode;
+
+	u16 calibration;// 0-20000
+
+	u8 reserved[22];
+}HAL_LS_PARAM_CMD_GET_TIME_t;
 
 typedef struct hal_led_screen{
 	u8 header;//0xA0
@@ -114,6 +147,9 @@ int hal_ls_param_set_cmd_send_info(u8 mode,u8 flash_onoff,u8 speed,
 //2nd
 int hal_ls_packet_set_cmd_send_info(u16 id, u8 cmd, HAL_LS_PARAM_CMD_SEND_INFO_t *param_in, wchar_t *info,
 	HAL_LS_t *ls_out);
+
+
+
 //3rd
 int hal_ls_packet_encode(HAL_LS_t *ls_in,u8 *param_buf_in, u8 *packet_out);
 
@@ -133,12 +169,23 @@ int hal_ls_CMD_SEND_INFO(const wchar_t *unicode_in, u16 info_len);
 
 int hal_ls_packet_decode(u8 *packet_in, HAL_LS_t *ls_out);
 
+void hal_ls_CMD_CLEAR_INFO(void);
+
 
 
 void hal_ls_init(void);
 
 //#define hal_wstr_len(p)	(wcslen(p)/4) //not work
-#define hal_wstr_len(p)	(sizeof(p)-2)//实际占用字节数
+#define hal_wstr_char_len(p)	(sizeof(p)-2)//字节数
+#define hal_wstr_wchar_len(p)	((sizeof(p)-2)/2)//宽字节数
+
+
+int hal_ls_param_set_time(u8 year, u8 month, u8 day, u8 hour, u8 min,
+	u8 second, u8 week, u8 mode, u16 calibration, HAL_LS_PARAM_CMD_SET_TIME_t *param_out);
+
+void hal_ls_CMD_SET_TIME(HAL_LS_PARAM_CMD_SET_TIME_t *param);
+
+void hal_ls_CMD_CLEAR_INFO(void);
 
 
 

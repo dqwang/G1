@@ -27,7 +27,10 @@ void hal_key_thread(void)
 	fd_set rdfs;
 	static volatile sig_atomic_t stop = 0;
 
-	wchar_t wstr[] = L"0"; 
+	u16 index = 0;
+	u16 len=0;	
+	wchar_t wstr[100] = L"";
+	u16 sum=0;
 	
 	log_msg("start %s\n", "key thread");
 	
@@ -45,7 +48,7 @@ void hal_key_thread(void)
 		if (rd < (int) sizeof(struct input_event)) {
 			printf("expected %d bytes, got %d\n", (int) sizeof(struct input_event), rd);
 			perror("\nevtest: error reading");
-			return 1;
+			return;
 		}
 
 		for (i = 0; i < rd / sizeof(struct input_event); i++) {
@@ -57,87 +60,179 @@ void hal_key_thread(void)
 			//printf("Event: time %ld.%06ld, ", ev[i].time.tv_sec, ev[i].time.tv_usec);
 
 			if (type == EV_KEY) {
+				
+
+				if (ev[i].value != 1){
+					continue;
+				}
+
 				printf("type %d, code %d ",	type,code);
 				if (type == EV_MSC && (code == MSC_RAW || code == MSC_SCAN))
 					printf("value %02x\n", ev[i].value);
 				else
 					printf("value %d\n", ev[i].value);
 
+				
 				switch(code){
 					case 82:{//0
-						memcpy(wstr, L"0", 4);
-						hal_ls_CMD_SEND_INFO(wstr,hal_wstr_len(wstr));
+						wchar_t w[]= L"0";
+						memcpy(wstr+index,w, hal_wstr_char_len(w));
+						index += hal_wstr_wchar_len(w);
+						len += hal_wstr_char_len(w);
+
+						hal_ls_CMD_SEND_INFO(wstr,len);
 					}break;
 
 					case 79:{// 1
-						memcpy(wstr, L"1", 4);
-						hal_ls_CMD_SEND_INFO(wstr,hal_wstr_len(wstr));
+						wchar_t w[]= L"1";
+						memcpy(wstr+index,w, hal_wstr_char_len(w));
+						index += hal_wstr_wchar_len(w);
+						len += hal_wstr_char_len(w);
+
+						hal_ls_CMD_SEND_INFO(wstr,len);
 					}break;
 					case 80:{// 2
-						memcpy(wstr, L"2", 4);
-						hal_ls_CMD_SEND_INFO(wstr,hal_wstr_len(wstr));
+						wchar_t w[]= L"2";
+						memcpy(wstr+index,w, hal_wstr_char_len(w));
+						index += hal_wstr_wchar_len(w);
+						len += hal_wstr_char_len(w);
+
+						hal_ls_CMD_SEND_INFO(wstr,len);
 					}break;
 					case 81:{// 3
-						memcpy(wstr, L"3", 4);
-						hal_ls_CMD_SEND_INFO(wstr,hal_wstr_len(wstr));
+						wchar_t w[]= L"3";
+						memcpy(wstr+index,w, hal_wstr_char_len(w));
+						index += hal_wstr_wchar_len(w);
+						len += hal_wstr_char_len(w);
+
+						hal_ls_CMD_SEND_INFO(wstr,len);
 					}break;
 					case 75:{// 4
-						memcpy(wstr, L"4", 4);
-						hal_ls_CMD_SEND_INFO(wstr,hal_wstr_len(wstr));
+						wchar_t w[]= L"4";
+						memcpy(wstr+index,w, hal_wstr_char_len(w));
+						index += hal_wstr_wchar_len(w);
+						len += hal_wstr_char_len(w);
+
+						hal_ls_CMD_SEND_INFO(wstr,len);
 					}break;
 					case 76:{// 5
-						memcpy(wstr, L"5", 4);
-						hal_ls_CMD_SEND_INFO(wstr,hal_wstr_len(wstr));
+						wchar_t w[]= L"5";
+						memcpy(wstr+index,w, hal_wstr_char_len(w));
+						index += hal_wstr_wchar_len(w);
+						len += hal_wstr_char_len(w);
+
+						hal_ls_CMD_SEND_INFO(wstr,len);
 					}break;
 					case 77:{// 6
-						memcpy(wstr, L"6", 4);
-						hal_ls_CMD_SEND_INFO(wstr,hal_wstr_len(wstr));
+						wchar_t w[]= L"6";
+						memcpy(wstr+index,w, hal_wstr_char_len(w));
+						index += hal_wstr_wchar_len(w);
+						len += hal_wstr_char_len(w);
+
+						hal_ls_CMD_SEND_INFO(wstr,len);
 					}break;
 					case 71:{// 7
-						memcpy(wstr, L"7", 4);
-						hal_ls_CMD_SEND_INFO(wstr,hal_wstr_len(wstr));
+						wchar_t w[]= L"7";
+						memcpy(wstr+index,w, hal_wstr_char_len(w));
+						index += hal_wstr_wchar_len(w);
+						len += hal_wstr_char_len(w);
+
+						hal_ls_CMD_SEND_INFO(wstr,len);
 					}break;
 					case 72:{// 8
-						memcpy(wstr, L"8", 4);
-						hal_ls_CMD_SEND_INFO(wstr,hal_wstr_len(wstr));
+						wchar_t w[]= L"8";
+						memcpy(wstr+index,w, hal_wstr_char_len(w));
+						index += hal_wstr_wchar_len(w);
+						len += hal_wstr_char_len(w);
+
+						hal_ls_CMD_SEND_INFO(wstr,len);
 					}break;
 					case 73:{// 9
-						memcpy(wstr, L"9", 4);
-						hal_ls_CMD_SEND_INFO(wstr,hal_wstr_len(wstr));
+						wchar_t w[]= L"9";
+						memcpy(wstr+index,w, hal_wstr_char_len(w));
+						index += hal_wstr_wchar_len(w);
+						len += hal_wstr_char_len(w);
+
+						hal_ls_CMD_SEND_INFO(wstr,len);
 					}break;
 					case 83:{// .
-						memcpy(wstr, L".", 4);
-						hal_ls_CMD_SEND_INFO(wstr,hal_wstr_len(wstr));
+						wchar_t w[]= L".";
+						memcpy(wstr+index,w, hal_wstr_char_len(w));
+						index += hal_wstr_wchar_len(w);
+						len += hal_wstr_char_len(w);
+
+						hal_ls_CMD_SEND_INFO(wstr,len);
 					}break;
 
 					case 96:{// enter
+						wchar_t w[]= L"=";
+						memcpy(wstr+index,w, hal_wstr_char_len(w));
+						index += hal_wstr_wchar_len(w);
+						len += hal_wstr_char_len(w);
 
+
+						/*TODO*/
+
+						hal_ls_CMD_SEND_INFO(wstr,len);
 					}break;
 
 					case 14:{// backspace
+						wchar_t w[]= L"";
+						
+						if (index){
+							index-=1;
+							len-=2;
 
+						
+							memcpy(wstr+index, w, sizeof(w));
+							memset(wstr+index, 0x0, sizeof(wstr)-len);
+							/*TODO*/
+							if (len != 0)
+								hal_ls_CMD_SEND_INFO(wstr,len);
+							else
+								//hal_ls_CMD_CLEAR_INFO();
+								hal_ls_CMD_SEND_INFO(wstr,sizeof(wstr));
+						}					
+						
 					}break;
 					case 78:{// +
-						memcpy(wstr, L"+", 4);
-						hal_ls_CMD_SEND_INFO(wstr,hal_wstr_len(wstr));
+						wchar_t w[]= L"+";
+						memcpy(wstr+index,w, hal_wstr_char_len(w));
+						index += hal_wstr_wchar_len(w);
+						len += hal_wstr_char_len(w);
+
+						hal_ls_CMD_SEND_INFO(wstr,len);
 					}break;
 					case 74:{// -
-						memcpy(wstr, L"-", 4);
-						hal_ls_CMD_SEND_INFO(wstr,hal_wstr_len(wstr));
+						wchar_t w[]= L"-";
+						memcpy(wstr+index,w, hal_wstr_char_len(w));
+						index += hal_wstr_wchar_len(w);
+						len += hal_wstr_char_len(w);
+
+						hal_ls_CMD_SEND_INFO(wstr,len);
 					}break;
 					case 55:{// *
-						memcpy(wstr, L"*", 4);
-						hal_ls_CMD_SEND_INFO(wstr,hal_wstr_len(wstr));
+						wchar_t w[]= L"*";
+						memcpy(wstr+index,w, hal_wstr_char_len(w));
+						index += hal_wstr_wchar_len(w);
+						len += hal_wstr_char_len(w);
+
+						hal_ls_CMD_SEND_INFO(wstr,len);
 					}break;
 					case 98:{// /
-						memcpy(wstr, L"/", 4);
-						hal_ls_CMD_SEND_INFO(wstr,hal_wstr_len(wstr));
+						wchar_t w[]= L"/";
+						memcpy(wstr+index,w, hal_wstr_char_len(w));
+						index += hal_wstr_wchar_len(w);
+						len += hal_wstr_char_len(w);
+
+						hal_ls_CMD_SEND_INFO(wstr,len);
 					}break;
 					default :{// 
 						log_err("%s\n", "invalid key");
 					}break;
 				};
 
+				sys_log(FUNC, LOG_DBG,"wstr index is %d, len is %d\n",index, len);
 				
 			} 
 		}
@@ -145,7 +240,7 @@ void hal_key_thread(void)
 	}
 
 	ioctl(fd, EVIOCGRAB, (void*)0);
-	return EXIT_SUCCESS;
+	
 }
 
 

@@ -56,6 +56,10 @@
 #include <getopt.h>
 #include <ctype.h>
 
+#include <locale.h>
+#include <wchar.h>
+
+
 #include "g1_hal_type.h"
 #include "g1_hal_keyboard.h"
 #include "g1_hal_led_screen.h"

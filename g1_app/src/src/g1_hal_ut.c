@@ -136,7 +136,7 @@ void hal_ut_LED_screen_unicode(void)
 	wchar_t wstr[] = L"1+2+34 = 37"; 
 
 	//char xxx[]="请扫描二维码";
-	u16 nCount = hal_wstr_char_len(wstr);
+	u16 nCount = hal_wstr_len(wstr);
 
 	#if 1
 	{
@@ -151,7 +151,7 @@ void hal_ut_LED_screen_unicode(void)
 	}
 	#endif
 	
-	hal_ls_CMD_SEND_INFO(wstr,hal_wstr_char_len(wstr));	
+	hal_ls_CMD_SEND_INFO(wstr,hal_wstr_len(wstr));	
 }
 
 
@@ -162,7 +162,7 @@ void hal_ut_LED_screen_set_time(void)
 	hal_ls_CMD_CLEAR_INFO();
 
 	
-	hal_ls_param_set_time(0x17,0x08,0x16,0x15,0x10,0x00,0x03,0x00,10000,&param);
+	hal_ls_param_set_time(0x17,0x08,0x16,0x15,0x10,0x00,0x03,0x01,10000,&param);
 
 
 	hal_ls_CMD_SET_TIME(&param);
@@ -171,84 +171,33 @@ void hal_ut_LED_screen_set_time(void)
 
 void hal_ut_wstr_test(void)
 {
-	//setlocale(LC_ALL,"zh_CN.utf8");
-	u16 index = 0;
-	u16 len=0;
-	wchar_t wstr[50]=L"";// 50bytes
+	wchar_t  wstr1[]=L"1";
+	wchar_t  wstr2[]=L"2";
 	
-	wchar_t wstr0[] = L"2";
-	wchar_t wstr1[] = L"+";
-	wchar_t wstr2[] = L"7";
-	wchar_t wstr3[] = L"+";
-	wchar_t wstr4[] = L"8";
-	
-	memcpy(wstr+index,wstr0, hal_wstr_char_len(wstr0));
-	index += hal_wstr_wchar_len(wstr0);
-	len += hal_wstr_char_len(wstr0);
-	
-	memcpy(wstr+index,wstr1, hal_wstr_char_len(wstr1));
-	index += hal_wstr_wchar_len(wstr1);
-	len += hal_wstr_char_len(wstr1);
-	
-	memcpy(wstr+index,wstr2, hal_wstr_char_len(wstr2));
-	index += hal_wstr_wchar_len(wstr2);
-	len += hal_wstr_char_len(wstr2);
-	memcpy(wstr+index,wstr3, hal_wstr_char_len(wstr3));
-	index += hal_wstr_wchar_len(wstr3);
-	len += hal_wstr_char_len(wstr3);
-	memcpy(wstr+index,wstr4, hal_wstr_char_len(wstr4));
-	index += hal_wstr_wchar_len(wstr4);
-	len += hal_wstr_char_len(wstr4);
+	wchar_t wstr[100]=L"xxxxxxx";
 
-	
-	#if 1
-	{
-		int i=0;
-		//printf("wstr %s: len:%d\n",__FUNCTION__,nCount);
-		for (i=0;i<len;i++){
-			printf("%02x ", ((u8*)wstr)[i]);
-			if ((i+1)%16 == 0 )
-				printf("\n");
-		}
-		printf("\n");
-	}
-	#endif
+	setlocale(LC_ALL,"zh_CN.utf8");
 
-	hal_ls_CMD_SEND_INFO(wstr,len);
-#if 0
 	wchar_t a[10] = L"hello";  
-
-	wprintf(L"xxx %ls", a);
-	wprintf(L"yyy %ls", a);
-
-	printf("wcslen(a) is %d, sizeof(a) is %d\n", wcslen(a),sizeof(a));
-
-	//wchar_t *wc = L"我是中国人"; 
-	wchar_t *wc = L"GREAT WALL"; 
-	//wprintf(L"%ls",wc);
-
-	//printf("%d %d %d %d %d \N", wcslen(L"1"),wcslen(L"12"),wcslen(L"123"),wcslen(L"1234"),wcslen(L"12345"));
-
-
-	wprintf(L"this is a test !\n");    
+    wprintf(L"this is a test !\n");    
     wprintf(L"%d\n",wcslen(a));      
     wprintf(L"%ls\n",a);
 
-	printf("%s\n", a);
-	wprintf(L"%ls\n", a);
+
+	
 
 	//wcscat(wstr, wstr1);
 	//wcscat(wstr, wstr2);
 	
 	//swprintf(wstr, 4, L"%s", L"1234");
 	
-#endif
+	
 	
 	#if 0
 	{
 		int i=0;
 		//printf("wstr %s: len:%d\n",__FUNCTION__,nCount);
-		for (i=0;i<10;i++){
+		for (i=0;i<4;i++){
 			printf("%02x ", ((u8*)wstr)[i]);
 			if ((i+1)%16 == 0 )
 				printf("\n");
@@ -259,5 +208,5 @@ void hal_ut_wstr_test(void)
 
 	
 
-	//hal_ls_CMD_SEND_INFO(wstr,hal_wstr_char_len(wstr));
+	//hal_ls_CMD_SEND_INFO(wstr,hal_wstr_len(wstr));
 }

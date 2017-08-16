@@ -420,7 +420,7 @@ void hal_ls_init(void)
 
 	//screen test
 	//clear screen
-	hal_ls_CMD_CLEAR_INFO();
+	//hal_ls_CMD_CLEAR_INFO();
 }
 
 
