@@ -85,6 +85,9 @@ typedef struct HAL_LS_PARAM_CMD_SEND_INFO_{
 	u8 reserved;	
 }HAL_LS_PARAM_CMD_SEND_INFO_t;
 
+#define HAL_LS_PARAM_CMD_SET_TIME_MODE0 0X00//show time if the cmd called
+#define HAL_LS_PARAM_CMD_SET_TIME_MODE1 0X01//show time if there are no others info to display.
+
 typedef struct HAL_LS_PARAM_CMD_SET_TIME_{
 	u8 year;
 	u8 month;
@@ -159,7 +162,9 @@ int hal_ls_packet_send(u8 *packet, u16 packet_len);
 
 
 //int hal_ls_CMD_SEND_INFO(const wchar_t *unicode_in);
-int hal_ls_CMD_SEND_INFO(const wchar_t *unicode_in, u16 info_len);
+int hal_ls_CMD_SEND_INFO(const wchar_t *unicode_in, u16 info_len,u8 mode,
+	u8 flash_onoff,u8 speed,u8 show_time,u8 flash_time,u8 show_count);
+
 
 
 /*Other API*/
@@ -168,10 +173,7 @@ int hal_ls_CMD_SEND_INFO(const wchar_t *unicode_in, u16 info_len);
 
 
 int hal_ls_packet_decode(u8 *packet_in, HAL_LS_t *ls_out);
-
-void hal_ls_CMD_CLEAR_INFO(void);
-
-
+int hal_ls_char2wchar(char *char_str, u8 char_str_len, wchar_t *wchar_str);
 
 void hal_ls_init(void);
 
@@ -186,7 +188,14 @@ int hal_ls_param_set_time(u8 year, u8 month, u8 day, u8 hour, u8 min,
 void hal_ls_CMD_SET_TIME(HAL_LS_PARAM_CMD_SET_TIME_t *param);
 
 void hal_ls_CMD_CLEAR_INFO(void);
+void hal_ls_clear_screen(void);
 
+void hal_ls_clear(void);
 
-
+void hal_ls_show_date_time(void);
+void hal_ls_show_welcome(void);
+void hal_ls_show_usb_keyboard(void);
+void hal_ls_show_consume_failed(void);
+void hal_ls_show_consume_failed_retry(void);
+void hal_ls_show_insufficient_balance(void);
 #endif/*__G1_HAL_LED_SCREEN_H__*/

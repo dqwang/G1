@@ -59,6 +59,7 @@
 #include <locale.h>
 #include <wchar.h>
 
+#include <math.h>
 
 #include "g1_hal_type.h"
 #include "g1_hal_keyboard.h"
@@ -66,6 +67,12 @@
 #include "g1_hal_ttyS.h"
 #include "g1_hal_log.h"
 #include "g1_hal_thread.h"
+#include "g1_hal_calc.h"
+#include "g1_hal_ntp.h"
+#include "g1_hal_uuid.h"
+#include "g1_hal_database.h"
+#include "g1_hal_mqtt.h"
+#include "g1_hal_timer.h"
 
 #include "g1_hal_ut.h"
 

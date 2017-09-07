@@ -65,8 +65,13 @@ void hal_ut_LED_screen(void)
 		0x81,0x1F,0xA1,0x2F,0x81,0x1F,0x26,0x19,
 		0x6D,0x03,0x00,0x50};*/
 	u8 buf[]={
-		0xA0,0x70,0x00,0x01,0x00,0x06,0x00,0x00,
-		0x00,0x00,0x00,0x00,0x00,0x03,0x00,0x00,
+		0xA0,
+		0x70,0x00,
+		0x01,0x00,
+		0x06,0x00,0x00,0x00,
+		0x00,0x00,0x00,0x00,
+		0x03,
+		0x00,0x00,
 
 		0x02,0x00,0x01,0x00,0x0E,0x02,0x02,0x00,
 		0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
@@ -137,6 +142,12 @@ void hal_ut_LED_screen_unicode(void)
 
 	//char xxx[]="«Î…®√Ë∂˛Œ¨¬Î";
 	u16 nCount = hal_wstr_char_len(wstr);
+	u8 mode=0x01;
+	u8 flash_onoff=0x00;
+	u8 speed=0x0E;
+	u8 show_time=0x00;
+	u8 flash_time=0x00;
+	u8 show_count=0x00;
 
 	#if 1
 	{
@@ -151,7 +162,8 @@ void hal_ut_LED_screen_unicode(void)
 	}
 	#endif
 	
-	hal_ls_CMD_SEND_INFO(wstr,hal_wstr_char_len(wstr));	
+	hal_ls_CMD_SEND_INFO(wstr,hal_wstr_char_len(wstr),mode,
+		flash_onoff,speed,show_time,flash_time,show_count);	
 }
 
 
@@ -159,11 +171,9 @@ void hal_ut_LED_screen_set_time(void)
 {
 	HAL_LS_PARAM_CMD_SET_TIME_t param;
 
-	hal_ls_CMD_CLEAR_INFO();
-
-	
-	hal_ls_param_set_time(0x17,0x08,0x16,0x15,0x10,0x00,0x03,0x00,10000,&param);
-
+	hal_ls_clear();
+	hal_ls_param_set_time(0x17,0x09,0x06,0x16,0x37,0x00,0x01,\
+		HAL_LS_PARAM_CMD_SET_TIME_MODE0,10000,&param);
 
 	hal_ls_CMD_SET_TIME(&param);
 }
@@ -175,6 +185,13 @@ void hal_ut_wstr_test(void)
 	u16 index = 0;
 	u16 len=0;
 	wchar_t wstr[50]=L"";// 50bytes
+
+	u8 mode=0x01;
+	u8 flash_onoff=0x00;
+	u8 speed=0x0E;
+	u8 show_time=0x00;
+	u8 flash_time=0x00;
+	u8 show_count=0x00;
 	
 	wchar_t wstr0[] = L"2";
 	wchar_t wstr1[] = L"+";
@@ -214,7 +231,8 @@ void hal_ut_wstr_test(void)
 	}
 	#endif
 
-	hal_ls_CMD_SEND_INFO(wstr,len);
+	hal_ls_CMD_SEND_INFO(wstr,len,mode,
+		flash_onoff,speed,show_time,flash_time,show_count);
 #if 0
 	wchar_t a[10] = L"hello";  
 
@@ -260,4 +278,290 @@ void hal_ut_wstr_test(void)
 	
 
 	//hal_ls_CMD_SEND_INFO(wstr,hal_wstr_char_len(wstr));
+}
+
+#if 1
+void hal_ut_calc(void)
+{
+	char exps0[100]="1.235+5.45";
+	char exps1[100]="1+2+2.1+4";
+	char exps2[100]="1++2.3+4";
+	char exps3[100]="1+.+2.4+4";
+	char exps4[100]="1+2..5+4";
+	char exps5[100]="1+2+2.0+";
+	char exps6[100]="1+2+2.0.";
+
+	u8 mode=0x01;
+	u8 flash_onoff=0x00;
+	u8 speed=0x0E;
+	u8 show_time=0x00;
+	u8 flash_time=0x00;
+	u8 show_count=0x00;
+
+	
+	int ret = 0;
+	char result_str[100]={'\0'};
+	
+	wchar_t wstr1[]={0x8f93, 0x5165, 0x9519,0x8bef, 0x0000};// ‰»Î¥ÌŒÛ
+	
+		
+	double result=0;
+
+	#if 0
+	double test = 120.123456;
+	char test_str[100]={'\0'};
+	printf("%.2f\n", test);
+	sprintf(test_str,"%.2f", test);
+
+	printf("%s\n",test_str);
+	#endif
+	
+	ret = hal_calc_exps(exps0,strlen(exps0),&result,result_str);
+	printf("result is %f result_str is %s\n", result, result_str);
+	
+
+	ret = hal_calc_exps(exps1,strlen(exps1),&result,result_str);
+	ret = hal_calc_exps(exps2,strlen(exps2),&result,result_str);
+	ret = hal_calc_exps(exps3,strlen(exps3),&result,result_str);
+	ret = hal_calc_exps(exps4,strlen(exps4),&result,result_str);
+	ret = hal_calc_exps(exps5,strlen(exps5),&result,result_str);
+
+	ret = hal_calc_exps(exps6,strlen(exps6), &result,result_str);
+
+	if (ret < 0){
+		hal_ls_CMD_SEND_INFO(wstr1,hal_wstr_char_len(wstr1),mode,
+			flash_onoff,speed,show_time,flash_time,show_count);
+	}
+}
+#endif 
+
+
+void hal_ut_disp_chinese(void)
+{
+	wchar_t wstr1[]={0x6d88,0x8d39,0x91d1,0x989d,0x00a5,0x0000};//œ˚∑—Ω∂Ó£§
+	u8 mode=0x01;
+	u8 flash_onoff=0x00;
+	u8 speed=0x0E;
+	u8 show_time=0x00;
+	u8 flash_time=0x00;
+	u8 show_count=0x00;
+	
+	hal_ls_CMD_SEND_INFO(wstr1,hal_wstr_char_len(wstr1),mode,
+		flash_onoff,speed,show_time,flash_time,show_count);	
+}
+
+
+void hal_ut_calc_input(void)
+{
+	wchar_t input_wchar_buf[10]=L"0";
+	u8 input_wchar_index = 0;
+	u8 len = 2;
+	
+	hal_calc_set_wchar_buf(input_wchar_buf, input_wchar_index,len);
+
+	sleep(1);
+	memcpy(input_wchar_buf, L"01", 4);
+	input_wchar_index +=1;
+	len +=2;
+	printf("input_wchar_index is %d len is %d\n", input_wchar_index, len);
+	hal_calc_set_wchar_buf(input_wchar_buf, input_wchar_index,len);
+	
+	sleep(1);
+	memcpy(input_wchar_buf, L"012", 6);
+	input_wchar_index +=1;
+	len +=2;
+	printf("input_wchar_index is %d len is %d\n", input_wchar_index, len);
+	hal_calc_set_wchar_buf(input_wchar_buf, input_wchar_index,len);
+
+	sleep(1);
+	memcpy(input_wchar_buf, L"0123", 8);
+	input_wchar_index +=1;
+	len +=2;
+	printf("input_wchar_index is %d len is %d\n", input_wchar_index, len);
+	hal_calc_set_wchar_buf(input_wchar_buf, input_wchar_index,len);
+
+	sleep(1);
+	memcpy(input_wchar_buf, L"01234", 10);
+	input_wchar_index +=1;
+	len +=2;
+	printf("input_wchar_index is %d len is %d\n", input_wchar_index, len);
+	hal_calc_set_wchar_buf(input_wchar_buf, input_wchar_index,len);
+
+	sleep(1);
+	memcpy(input_wchar_buf, L"012345", 12);
+	input_wchar_index +=1;
+	len +=2;
+	printf("input_wchar_index is %d len is %d\n", input_wchar_index, len);
+	hal_calc_set_wchar_buf(input_wchar_buf, input_wchar_index,len);
+
+	sleep(1);
+	memcpy(input_wchar_buf, L"0123456", 14);
+	input_wchar_index +=1;
+	len +=2;
+	printf("input_wchar_index is %d len is %d\n", input_wchar_index, len);
+	hal_calc_set_wchar_buf(input_wchar_buf, input_wchar_index,len);
+
+	sleep(1);
+	memcpy(input_wchar_buf, L"01234567", 16);
+	input_wchar_index +=1;
+	len +=2;
+	printf("input_wchar_index is %d len is %d\n", input_wchar_index, len);
+	hal_calc_set_wchar_buf(input_wchar_buf, input_wchar_index,len);
+
+	sleep(1);
+	memcpy(input_wchar_buf, L"012345678", 18);
+	input_wchar_index +=1;
+	len +=2;
+	printf("input_wchar_index is %d len is %d\n", input_wchar_index, len);
+	hal_calc_set_wchar_buf(input_wchar_buf, input_wchar_index,len);
+
+	sleep(1);
+	memcpy(input_wchar_buf, L"0123456789", 20);
+	input_wchar_index +=1;
+	len +=2;
+	printf("input_wchar_index is %d len is %d\n", input_wchar_index, len);
+	hal_calc_set_wchar_buf(input_wchar_buf, input_wchar_index,len);
+
+#if 1
+
+	sleep(1);
+
+	memcpy(input_wchar_buf, L"012345678", 18);
+	input_wchar_index -=1;
+	len -=2;
+	printf("input_wchar_index is %d len is %d\n", input_wchar_index, len);
+	hal_calc_set_wchar_buf(input_wchar_buf, input_wchar_index,len);
+	
+	sleep(1);
+	memcpy(input_wchar_buf, L"01234567", 16);
+	input_wchar_index -=1;
+	len -=2;
+	printf("input_wchar_index is %d len is %d\n", input_wchar_index, len);
+	hal_calc_set_wchar_buf(input_wchar_buf, input_wchar_index,len);
+
+	sleep(1);
+	memcpy(input_wchar_buf, L"0123456", 14);
+	input_wchar_index -=1;
+	len -=2;
+	printf("input_wchar_index is %d len is %d\n", input_wchar_index, len);
+	hal_calc_set_wchar_buf(input_wchar_buf, input_wchar_index,len);
+
+	sleep(1);
+	memcpy(input_wchar_buf, L"012345", 12);
+	input_wchar_index -=1;
+	len -=2;
+	printf("input_wchar_index is %d len is %d\n", input_wchar_index, len);
+	hal_calc_set_wchar_buf(input_wchar_buf, input_wchar_index,len);
+	
+	sleep(1);
+	memcpy(input_wchar_buf, L"01234", 10);
+	input_wchar_index -=1;
+	len -=2;
+	printf("input_wchar_index is %d len is %d\n", input_wchar_index, len);
+	hal_calc_set_wchar_buf(input_wchar_buf, input_wchar_index,len);
+	
+	sleep(1);
+	memcpy(input_wchar_buf, L"0123", 8);
+	input_wchar_index -=1;
+	len -=2;
+	printf("input_wchar_index is %d len is %d\n", input_wchar_index, len);
+	hal_calc_set_wchar_buf(input_wchar_buf, input_wchar_index,len);
+
+	sleep(1);
+	memcpy(input_wchar_buf, L"012", 6);
+	input_wchar_index -=1;
+	len -=2;
+	printf("input_wchar_index is %d len is %d\n", input_wchar_index, len);	
+	hal_calc_set_wchar_buf(input_wchar_buf, input_wchar_index,len);
+
+	sleep(1);
+	memcpy(input_wchar_buf, L"01", 4);
+	input_wchar_index -=1;
+	len -=2;
+	printf("input_wchar_index is %d len is %d\n", input_wchar_index, len);
+	hal_calc_set_wchar_buf(input_wchar_buf, input_wchar_index,len);
+
+	sleep(1);
+	memcpy(input_wchar_buf, L"0", 2);
+	input_wchar_index -=1;
+	len -=2;
+	printf("input_wchar_index is %d len is %d\n", input_wchar_index, len);
+	hal_calc_set_wchar_buf(input_wchar_buf, input_wchar_index,len);
+
+	sleep(1);
+	len -=2;
+	printf("input_wchar_index is %d len is %d\n", input_wchar_index, len);
+	hal_calc_set_wchar_buf(input_wchar_buf, input_wchar_index,len);
+#endif
+}
+
+void hal_ut_string(void)
+{
+	char dst[100]="hello";
+	char src[100]=" world";
+
+	strcat(dst,src);
+
+	printf("dst is %s, src %s \n", dst, src);
+}
+
+void hal_ut_char_wchar(void)
+{
+	char char_str[100]="hello";
+	wchar_t wchar_str[100]=L"";
+
+	//mbstowcs(wchar_str, char_str, strlen(char_str));// not work , the wchar in linux is 4 bytes, we need 2 bytes unicode...
+	hal_ls_char2wchar(char_str, strlen(char_str), wchar_str);
+	
+	#if 1
+	{
+		int i=0;
+		printf("info %s:\n",__FUNCTION__);
+		for (i=0;i<2*strlen(char_str);i++){
+			printf("%02x ", ((u8*)wchar_str)[i]);
+			if ((i+1)%16 == 0 )
+				printf("\n");
+		}
+		printf("\n");
+	}
+	#endif
+
+
+	
+}
+
+
+void hal_ut_show_date_time(void)
+{
+	hal_ls_clear();
+	hal_ls_show_date_time();	
+}
+
+void hal_ut_get_rtc_time(void)
+{
+	hal_date_t hal_date;
+	
+	hal_get_time_from_mt7688(&hal_date);
+
+	
+}
+
+void hal_ut(void)
+{
+	//hal_ut_thread();
+	//hal_ut_ttyS0_echo();
+	//hal_ut_LED_screen();
+	//hal_ut_LED_screen_unicode();
+
+	//hal_ut_LED_screen_set_time();
+	//hal_ut_wstr_test();
+	
+	//hal_ut_disp_chinese();
+	//hal_ut_calc_input();
+	
+	//hal_ut_calc();
+	//hal_ut_string();
+	//hal_ut_char_wchar();
+	//hal_ut_show_date_time();
+	//hal_ut_get_rtc_time();
 }

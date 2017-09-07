@@ -96,7 +96,7 @@ int hal_ls_param_set_cmd_send_info(u8 mode,u8 flash_onoff,u8 speed,
 	memset(param_out->stop_time, 0x0, sizeof(param_out->stop_time));
 
 	param_out->color = 0x01;
-	param_out->info_type = 0x00;
+	param_out->info_type = 0x05;//XXX: 显示实时时间，需要设置为0x05
 	param_out->info_current_index = 0x00;
 	param_out->info_max_index = 0x00;
 
@@ -282,8 +282,13 @@ int hal_ls_packet_send(u8 *packet, u16 packet_len)
 	return hal_ttyS0_send((u8*)packet, packet_len);
 }
 
+void hal_ls_delay(void)
+{
+	usleep(50000);//delay 100ms before displaying other information
+}
 
-int hal_ls_CMD_SEND_INFO(const wchar_t *unicode_in, u16 info_len)
+int hal_ls_CMD_SEND_INFO(const wchar_t *unicode_in, u16 info_len,u8 mode,
+	u8 flash_onoff,u8 speed,u8 show_time,u8 flash_time,u8 show_count)
 {
 	wchar_t info[HAL_LS_INFO_MAX_LEN];
 	HAL_LS_PARAM_CMD_SEND_INFO_t param;
@@ -293,7 +298,9 @@ int hal_ls_CMD_SEND_INFO(const wchar_t *unicode_in, u16 info_len)
 		return -1;
 	}
 	hal_ls_info_set_cmd_send_info(unicode_in, info_len, info);
-	hal_ls_param_set_cmd_send_info(0x01,0x00,0x0E,0X02,0X02,0X00,info_len,&param);
+	//hal_ls_param_set_cmd_send_info(0x01,0x00,0x0E,0X00,0X02,0X00,info_len,&param);
+	hal_ls_param_set_cmd_send_info(mode,flash_onoff,speed,show_time,flash_time,show_count,info_len,&param);
+	
 	hal_ls_packet_set_cmd_send_info(0x0000,CMD_SEND_INFO, &param, info, &hal_ls);
 
 	hal_ls_cmd_send_info_param_buf_set(&param, param_buf);
@@ -302,10 +309,32 @@ int hal_ls_CMD_SEND_INFO(const wchar_t *unicode_in, u16 info_len)
 
 	hal_ls_packet_send(hal_packet_sbuf, hal_ls.len);
 
+	hal_ls_delay();// FIX 000 display bug
 	return 0;
 }
 
 
+
+void hal_ls_clear_screen(void)
+{
+	wchar_t disp_wchar_buf[HAL_CALC_DISP_WCHAR_BUF_SIZE];
+
+	u8 mode=0x01;
+	u8 flash_onoff=0x00;
+	u8 speed=0x0E;
+	u8 show_time=0x00;
+	u8 flash_time=0x00;
+	u8 show_count=0x00;
+	
+	memcpy(disp_wchar_buf, HAL_CALC_8_SPACE_WCHAR, HAL_CALC_DISP_INFO_LEN);
+
+	hal_ls_CMD_SEND_INFO(disp_wchar_buf, HAL_CALC_DISP_INFO_LEN,mode,
+	flash_onoff,speed,show_time,flash_time,show_count);
+
+	hal_ls_delay();
+}
+
+/*clear the text info in the LED Screen EEPROM, but not clear the Sreen*/
 void hal_ls_CMD_CLEAR_INFO(void)
 {
 	/*A0 34 00 01 00 12 00 00
@@ -326,9 +355,17 @@ void hal_ls_CMD_CLEAR_INFO(void)
 		0xED,0x00,0x00,0x50	
 	};
 	hal_ttyS0_send(buf,sizeof(buf));
+
+	hal_ls_delay();
+	
 }
 
 
+void hal_ls_clear(void)
+{
+	hal_ls_clear_screen();
+	hal_ls_CMD_CLEAR_INFO();
+}
 
 
 int hal_ls_param_set_time(u8 year, u8 month, u8 day, u8 hour, u8 min,
@@ -363,7 +400,7 @@ static int hal_ls_cmd_set_time_param_buf_set(HAL_LS_PARAM_CMD_SET_TIME_t *param_
 	param_buf_out[1] = param_in->month;
 	param_buf_out[2] = param_in->day;
 	param_buf_out[3] = param_in->hour;
-	param_buf_out[3] = param_in->minute;
+	param_buf_out[4] = param_in->minute;
 	param_buf_out[5] = param_in->second;
 	param_buf_out[6] = param_in->week;
 	param_buf_out[7] = param_in->mode;
@@ -372,6 +409,20 @@ static int hal_ls_cmd_set_time_param_buf_set(HAL_LS_PARAM_CMD_SET_TIME_t *param_
 	param_buf_out[9] = hal_get_u16_msb(param_in->calibration);
 
 	memcpy(param_buf_out+10, param_in->reserved, sizeof(param_in->reserved));
+
+	#if 1
+	{
+		int i=0;
+		printf("param_buf_out in %s():\n",__FUNCTION__);
+		for (i=0;i<HAL_LS_PARAM_LEN;i++){
+			printf("%02x ", ((u8*)param_buf_out)[i]);
+			if ((i+1)%16 == 0 )
+				printf("\n");
+		}
+		printf("\n");
+	}
+	#endif
+
 	return 0;
 }
 
@@ -399,8 +450,6 @@ int hal_ls_packet_set_cmd_set_time(u16 id, u8 cmd, HAL_LS_PARAM_CMD_SET_TIME_t*p
 	return 0;
 }
 
-
-
 void hal_ls_CMD_SET_TIME(HAL_LS_PARAM_CMD_SET_TIME_t *param)
 {
 	u8 param_buf[HAL_LS_PARAM_LEN];
@@ -414,13 +463,130 @@ void hal_ls_CMD_SET_TIME(HAL_LS_PARAM_CMD_SET_TIME_t *param)
 	hal_ls_packet_send(hal_packet_sbuf, hal_ls.len);
 }
 
+int hal_ls_char2wchar(char *char_str, u8 char_str_len, wchar_t *wchar_str)
+{
+	u8 i=0,j=0;
+	if (char_str == NULL||char_str_len == 0||wchar_str == NULL){
+		return -1;
+	}
+
+	for(i=0;i<char_str_len;i++){
+		wchar_str[j] = char_str[i];
+		wchar_str[++j]=0x00;
+	}
+	return 0;
+}
+
 void hal_ls_init(void)
 {
 	hal_ls_init_struct();
 
 	//screen test
 	//clear screen
-	hal_ls_CMD_CLEAR_INFO();
+	hal_ls_clear();
+}
+
+void hal_ls_show_date_time(void)
+{
+	wchar_t date_time[]={0x0032,0x0030,0x000b,0x000c,0x5e74,//year
+		0x000d, 0x000e, 0x6708,//month 
+		0x000f, 0x0010, 0x65e5,//day
+		0x0020,0x0020,
+		0x0011, 0x0012, 0x65f6,//hour
+		0x0013, 0x0014, 0x5206,//minute
+		0x0000//
+		};
+
+	u8 mode=0x0F;
+	u8 flash_onoff=0x00;
+	u8 speed=0x48;
+	u8 show_time=0x00;
+	u8 flash_time=0x00;
+	u8 show_count=0x00;
+	
+	hal_ls_CMD_SEND_INFO(date_time,hal_wstr_char_len(date_time),mode,
+		flash_onoff,speed,show_time,flash_time,show_count);
 }
 
 
+void hal_ls_show_welcome(void)
+{
+	wchar_t welcome[]={0x6b22,0x8fce,0x4f7f,0x7528,0x0000};
+
+	u8 mode=0x12;
+	u8 flash_onoff=0x00;
+	u8 speed=0x48;
+	u8 show_time=0x02;
+	u8 flash_time=0x00;
+	u8 show_count=0x00;
+	
+	hal_ls_CMD_SEND_INFO(welcome,hal_wstr_char_len(welcome),mode,
+		flash_onoff,speed,show_time,flash_time,show_count);
+
+	sleep(3);
+}
+
+void hal_ls_show_usb_keyboard(void)
+{
+	wchar_t usb_keyboard[]={0x8bf7,0x60A8,0x63A5,0x5165,
+							0x0055,0X0053,0X0042,0X0020,
+							0X952E,0X76D8,
+							0x0000};//请您接入USB 键盘
+	u8 mode=0x02;
+	u8 flash_onoff=0x00;
+	u8 speed=0x18;
+	u8 show_time=0x01;
+	u8 flash_time=0x00;
+	u8 show_count=0x00;
+	
+	hal_ls_CMD_SEND_INFO(usb_keyboard,hal_wstr_char_len(usb_keyboard),mode,
+		flash_onoff,speed,show_time,flash_time,show_count);
+}
+
+void hal_ls_show_consume_failed(void)
+{
+	wchar_t consume_failed[]={0x6d88,0x8d39,0x5931,0x8d25,
+							0xff0c,0X5df2,0X53d6,0X6d88,
+							0x0000};//消费失败，已取消
+	u8 mode=0x02;
+	u8 flash_onoff=0x00;
+	u8 speed=0x18;
+	u8 show_time=0x01;
+	u8 flash_time=0x00;
+	u8 show_count=0x00;
+	
+	hal_ls_CMD_SEND_INFO(consume_failed,hal_wstr_char_len(consume_failed),mode,
+		flash_onoff,speed,show_time,flash_time,show_count);
+}
+
+void hal_ls_show_consume_failed_retry(void)
+{
+	wchar_t consume_failed[]={0x6d88,0x8d39,0x5931,0x8d25,
+							0xff0c,0X8BF7,0X91CD,0X8BD5,
+							0x0000};//消费失败，请重试
+
+	u8 mode=0x02;
+	u8 flash_onoff=0x00;
+	u8 speed=0x18;
+	u8 show_time=0x01;
+	u8 flash_time=0x00;
+	u8 show_count=0x00;
+	
+	hal_ls_CMD_SEND_INFO(consume_failed,hal_wstr_char_len(consume_failed),mode,
+		flash_onoff,speed,show_time,flash_time,show_count);
+}
+
+void hal_ls_show_insufficient_balance(void)
+{
+	wchar_t insufficient_balance[]={0x4f59,0x989d,0x4e0d,0x8db3,
+							0x0000};//余额不足
+	u8 mode=0x02;
+	u8 flash_onoff=0x00;
+	u8 speed=0x18;
+	u8 show_time=0x01;
+	u8 flash_time=0x00;
+	u8 show_count=0x00;
+	
+	hal_ls_CMD_SEND_INFO(insufficient_balance,hal_wstr_char_len(insufficient_balance),
+		mode,flash_onoff,speed,show_time,flash_time,show_count);
+}

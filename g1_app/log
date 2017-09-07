@@ -1,0 +1,12 @@
+rm -rf g1_app 
+rm -rf ./obj/*.o
+mipsel-openwrt-linux-uclibc-gcc -Wall -fshort-wchar -I./inc/ -g -c ./src/g1_app_main.c -o ./obj/g1_app_main.o
+mipsel-openwrt-linux-uclibc-gcc -Wall -fshort-wchar -I./inc/ -g -c ./src/g1_hal_keyboard.c -o ./obj/g1_hal_keyboard.o
+mipsel-openwrt-linux-uclibc-gcc -Wall -fshort-wchar -I./inc/ -g -c ./src/g1_hal_led_screen.c -o ./obj/g1_hal_led_screen.o
+mipsel-openwrt-linux-uclibc-gcc -Wall -fshort-wchar -I./inc/ -g -c ./src/g1_hal_log.c -o ./obj/g1_hal_log.o
+mipsel-openwrt-linux-uclibc-gcc -Wall -fshort-wchar -I./inc/ -g -c ./src/g1_hal_ttyS.c -o ./obj/g1_hal_ttyS.o
+mipsel-openwrt-linux-uclibc-gcc -Wall -fshort-wchar -I./inc/ -g -c ./src/g1_hal_thread.c -o ./obj/g1_hal_thread.o
+mipsel-openwrt-linux-uclibc-gcc -Wall -fshort-wchar -I./inc/ -g -c ./src/g1_hal_ut.c -o ./obj/g1_hal_ut.o
+#mipsel-openwrt-linux-uclibc-gcc -Wall -I./inc/ -g -c ./src/g1_hal_ut.c -o ./obj/g1_hal_ut.o
+mipsel-openwrt-linux-uclibc-gcc -Wall -fshort-wchar -I./inc/ -g -c ./src/g1_hal_calc.c -o ./obj/g1_hal_calc.o
+mipsel-openwrt-linux-uclibc-gcc -O0 -o g1_app ./obj/g1_app_main.o ./obj/g1_hal_keyboard.o ./obj/g1_hal_led_screen.o ./obj/g1_hal_log.o ./obj/g1_hal_ttyS.o ./obj/g1_hal_thread.o ./obj/g1_hal_ut.o ./obj/g1_hal_calc.o                     -lpthread

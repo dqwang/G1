@@ -133,19 +133,19 @@ int hal_ttyS0_set(int baud,int databits, int parity, int stopbits)
 
 	switch (parity)
 	{
-		case 3:
+		case 0://None
 			ntm.c_cflag &= ~PARENB;
 			ntm.c_cflag &= ~PARODD;
 			ntm.c_iflag &= ~(INPCK | ISTRIP);
 		break;
 		
-		case 2://Ææ
+		case 1://Odd Parity Check
 			ntm.c_cflag  |= PARENB;
 			ntm.c_cflag  |= PARODD;
 			ntm.c_iflag  |=(INPCK | ISTRIP);
 		break;
 		
-		case 1://Å¼
+		case 2://even parity check
 			ntm.c_iflag  |=(INPCK | ISTRIP);
 			ntm.c_cflag  |=PARENB;
 			ntm.c_cflag  &=~ PARODD;
@@ -268,7 +268,7 @@ void hal_ttyS0_init(void)
 	hal_ttyS0_open();
 
 	//set
-	hal_ttyS0_set(57600,8,3,1);
+	hal_ttyS0_set(57600,8,0,1);
 	//recv thread
 	trd_create(&trd_id, (void*)&hal_ttyS0_recv_thread, NULL);
 }
