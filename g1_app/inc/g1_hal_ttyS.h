@@ -1,7 +1,7 @@
 #ifndef __G1_HAL_TTYS_H__
 #define __G1_HAL_TTYS_H__
 
-#define TTY_DEV "/dev/ttyS0"
+#define TTY_DEV "/dev/ttyS2"//开发板是ttyS0 ,正式板是ttyS2
 #define TTYS0_RBUF_MAX (1024)
 
 

@@ -310,8 +310,11 @@ void hal_key_thread(int *p_fd)
 							break;
 						}
 
-						sprintf(hal_current_balance_str, "%.2f", hal_current_balance);
-						hal_calc_disp_balance(hal_current_balance_str);
+						//sprintf(hal_current_balance_str, "%.2f", hal_current_balance);
+						//hal_calc_disp_balance(hal_current_balance_str);
+
+						sprintf(today_income_str, "%.2f", today_income);
+						hal_calc_disp_today_income(today_income_str);
 						
 					}break;
 					case HAL_KEY_CODE_DIVIDE:{// /

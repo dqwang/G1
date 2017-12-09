@@ -8,7 +8,7 @@ void hal_ttyS0_open(void)
 	if(hal_ttyS0_fd>0){
 		fcntl(hal_ttyS0_fd,F_SETFL,0);
 	}
-	log_debug("open ttyS0, fd is %d\n",hal_ttyS0_fd);
+	sys_log(FUNC, LOG_DBG,"open %s, fd is %d\n",TTY_DEV,hal_ttyS0_fd);
 }
 
 void hal_ttyS0_close(void)

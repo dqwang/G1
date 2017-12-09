@@ -172,7 +172,7 @@ void hal_ut_LED_screen_set_time(void)
 	HAL_LS_PARAM_CMD_SET_TIME_t param;
 
 	hal_ls_clear();
-	hal_ls_param_set_time(0x17,0x09,0x06,0x16,0x37,0x00,0x01,\
+	hal_ls_param_set_time(0x17,0x09,0x24,0x21,0x31,0x00,0x01,\
 		HAL_LS_PARAM_CMD_SET_TIME_MODE0,10000,&param);
 
 	hal_ls_CMD_SET_TIME(&param);

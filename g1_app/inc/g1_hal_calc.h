@@ -36,10 +36,14 @@ typedef struct hal_calc{
 	u8 num_index;
 	double sum;
 	char sum_str[HAL_CALC_SUM_CHAR_STR_LEN];//xxxxxx.xx
+
 }HAL_CALC_t;
 
 
 extern HAL_CALC_t hal_calc;
+
+extern double today_income;
+extern char today_income_str[HAL_CALC_SUM_CHAR_STR_LEN];//xxxxxx.xx
 
 void hal_calc_reset(void);
 void hal_calc_disp(void);
@@ -51,6 +55,7 @@ int hal_calc_exps(char *exps, u8 exps_len, double *result, char *result_str);
 void hal_calc_disp_money(char *money_str);
 void hal_calc_disp_money_successfully(char *money_str);
 void hal_calc_disp_balance(char *money_str);
+void hal_calc_disp_today_income(char *money_str);
 
 
 

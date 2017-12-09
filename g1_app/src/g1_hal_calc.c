@@ -2,6 +2,9 @@
 
 HAL_CALC_t hal_calc;
 
+double today_income=0;
+char today_income_str[HAL_CALC_SUM_CHAR_STR_LEN]="";//xxxxxx.xx
+
 #if 1
 int hal_calc_is_num(char ch)
 {
@@ -186,6 +189,12 @@ int hal_calc_exps(char *exps, u8 exps_len, double *result, char *result_str)
 
 	*result = hal_calc.sum;
 	memcpy(result_str, hal_calc.sum_str, sizeof(hal_calc.sum_str));
+
+	today_income +=  hal_calc.sum;
+	sprintf(today_income_str, "%.2f", today_income);
+
+	sys_log(FUNC, LOG_DBG,"after floor: today_income=%f today_income_str %s\n", today_income, today_income_str);
+	
 	return 0;
 }
 
@@ -229,7 +238,7 @@ void hal_calc_disp_money_successfully(char *money_str)//消费成功账户余额xxxxxx.x
 	wchar_t money_wchar[HAL_CALC_SUM_WCHAR_STR_LEN]={0x00};
 	u16 info_len = 0;
 
-	u8 mode=0x0d;
+	u8 mode=0x04;
 	u8 flash_onoff=0x00;
 	u8 speed=0x0f;
 	u8 show_time=0x02;
@@ -249,9 +258,9 @@ void hal_calc_disp_money_successfully(char *money_str)//消费成功账户余额xxxxxx.x
 	
 	hal_ls_char2wchar(money_str,strlen(money_str) ,money_wchar+8);
 
-	money_wchar[8+strlen(money_str)]=0x5143;//元
+	//money_wchar[8+strlen(money_str)]=0x5143;//元
 
-	info_len = strlen(money_str)*2+9*2;
+	info_len = strlen(money_str)*2+8*2;
 		
 	hal_ls_CMD_SEND_INFO(money_wchar, info_len,mode,
 		flash_onoff,speed,show_time,flash_time,show_count);//￥+ money_str
@@ -265,7 +274,7 @@ void hal_calc_disp_balance(char *money_str)//账户余额xxxxxx.xx元
 	wchar_t money_wchar[HAL_CALC_SUM_WCHAR_STR_LEN]={0x00};
 	u16 info_len = 0;
 
-	u8 mode=0x0d;
+	u8 mode=0x04;
 	u8 flash_onoff=0x00;
 	u8 speed=0x0f;
 	u8 show_time=0x02;
@@ -280,9 +289,9 @@ void hal_calc_disp_balance(char *money_str)//账户余额xxxxxx.xx元
 	
 	hal_ls_char2wchar(money_str,strlen(money_str) ,money_wchar+4);
 
-	money_wchar[4+strlen(money_str)]=0x5143;//元
+	//money_wchar[4+strlen(money_str)]=0x5143;//元
 
-	info_len = strlen(money_str)*2+5*2;
+	info_len = strlen(money_str)*2+4*2;
 		
 	hal_ls_CMD_SEND_INFO(money_wchar, info_len,mode,
 		flash_onoff,speed,show_time,flash_time,show_count);//￥+ money_str
@@ -290,4 +299,33 @@ void hal_calc_disp_balance(char *money_str)//账户余额xxxxxx.xx元
 	
 }
 
+void hal_calc_disp_today_income(char *money_str)//今日收入xxxxx.xx
+{
+	wchar_t money_wchar[HAL_CALC_SUM_WCHAR_STR_LEN]={0x00};
+	u16 info_len = 0;
+
+	u8 mode=0x04;
+	u8 flash_onoff=0x00;
+	u8 speed=0x0f;
+	u8 show_time=0x02;
+	u8 flash_time=0x00;
+	u8 show_count=0x00;
+
+	
+	money_wchar[0]=0x4eca;//今日收入
+	money_wchar[1]=0x65e5;
+	money_wchar[2]=0x6536;
+	money_wchar[3]=0x5165;
+	
+	hal_ls_char2wchar(money_str,strlen(money_str) ,money_wchar+4);
+
+	//money_wchar[4+strlen(money_str)]=0x5143;//元
+
+	info_len = strlen(money_str)*2+4*2;
+		
+	hal_ls_CMD_SEND_INFO(money_wchar, info_len,mode,
+		flash_onoff,speed,show_time,flash_time,show_count);//￥+ money_str
+
+	
+}
 
